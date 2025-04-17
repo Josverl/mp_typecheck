@@ -1,0 +1,85 @@
+name: 'MicroPython_type_checking'
+description: 'Run type checking on MicroPython projects using Pyright or Mypy'
+author: 'Jos Verlinde'
+
+branding:
+  icon: 'cpu'
+  color: 'yellow'
+
+
+inputs:
+
+  mp-stubs:  # id of input
+    description: 'The name of the MicroPython stub package to use'
+    required: false
+    default: 'micropython-rp2-stubs'
+
+  typechecker:  # id of input
+    description: 'The typechecker to use (pyright, mypy)'
+    required: false
+    default: 'pyright'
+
+  # pyproject:  # id of input
+  #   description: 'the path to the pyproject.toml'
+  #   required: false
+  #   default: ${{ github.workspace }}/pyproject.toml
+  #   default: ${{ github.action_path }}/pyproject.toml
+
+
+runs:
+  using: "composite"
+  steps:
+    - name: Install uv
+      uses: astral-sh/setup-uv@v5
+      with: 
+          pyproject-file: "${{ inputs.pyproject }}"
+          enable-cache: true
+          cache-dependency-glob: ${{ github.action_path }}/pyproject.toml # action's pyproject
+
+    # install type checkers ?
+    # preinstalled : pyright / mypy 
+    # todo :  / astral / pytorch 
+
+    # install requested type-stubs 
+    - name: Install micropython-stubs
+      shell: bash
+      run: |
+        uv pip install ${{ inputs.mp-stubs }} --target typings
+
+    - name: Tree
+      if: ${{ contains(inputs.typechecker, 'debug') }}
+      shell: bash
+      run: |
+        echo "Tree of the action's directory"
+        tree -L 2 ${{ github.action_path }}
+        echo "Tree of the action's directory with stubs"
+        tree -L 2 ${{ github.workspace }}
+
+    # run pyright
+    - if: ${{ contains(inputs.typechecker, 'pyright') }}
+      uses: jakebailey/pyright-action@v2
+      with:
+        pylance-version: latest-release
+        project: ${{ github.workspace }}	
+
+    # install and run mypy
+    - if: ${{ contains(inputs.typechecker, 'mypy') }}
+      name: Install mypy
+      shell: bash
+      run: uv tool install mypy
+
+    - if: ${{ contains(inputs.typechecker, 'mypy') }}
+      name: Run mypy
+      shell: bash
+      run: mypy --config-file ${{ github.workspace }}/pyproject.toml
+
+      # install and run pyre
+    - if: ${{ contains(inputs.typechecker, 'pyre') }}
+      name: Install pyre
+      shell: bash
+      run: uv tool install pyre
+
+    - if: ${{ contains(inputs.typechecker, 'pyre') }}
+      name: Run pyre
+      shell: bash
+      run: pyre check --source-directory ${{ github.workspace }} --config-file ${{ github.workspace }}/pyproject.toml

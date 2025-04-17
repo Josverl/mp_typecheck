@@ -1,0 +1,36 @@
+[project]
+name = "typecheck_mp"
+version = "0.1.0"
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: MicroPython",
+  "License :: OSI Approved :: MIT License"
+]
+
+
+[project.optional-dependencies]
+# uv pip install -r pyproject.toml --extra checkers
+checkers = [
+  "mypy"
+]
+
+[tool.uv]
+required-version = ">=0.6"
+
+# ###################################################################
+# pyright options for MicroPython
+# ###################################################################
+
+[tool.pyright]
+include = ["src"]
+extraPaths = ["src/lib"]
+
+ignore = ["**/typings"]
+exclude = [".*", "__*", "**/typings"]
+
+typeCheckingMode = "standard"
+stubPath = "typings"
+typeshedPath = "typings"
+pythonPlatform = "Linux"
+
+reportMissingModuleSource = "none"
