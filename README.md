@@ -28,8 +28,8 @@ jobs:
 
 To use the same configuration in CI and locally the recommendation is to use the `pyproject.toml` file. 
 
+### Action
 Below is an example of a `pyproject.toml` file that can be used to configure the action and local type checker, or your IDE of choise.
-
 ```toml
 [project]
 name = "myprojec"
@@ -40,6 +40,8 @@ classifiers = [
   "Programming Language :: Python :: MicroPython",
   "License :: OSI Approved :: MIT License"
 ]
+
+### Configuration 
 
 [project.optional-dependencies]
 # install to folder typings
@@ -92,4 +94,36 @@ exclude = [
     "typings[\\/].*", # TOML basic string 
 ]
 ```
+
+### Using multiple configurations
+
+Actions allow you to validate your code against the type stubs of multiple ports, boards and versions of MicroPython.
+Below is an example of a matrix test against multipl boards and versions.
+![image](https://github.com/user-attachments/assets/bb2f0c72-c573-454a-8835-58ef9df72855)
+
+```YAML
+on:
+  push:
+  workflow_dispatch:
+jobs:
+  many_ports:
+    strategy:
+      fail-fast: false
+      matrix:
+        port: [rp2-pico_w, esp32, esp8266, stm32, samd]
+        version: ["1.24.1", "1.25.0"]
+    runs-on: ubuntu-latest
+    name: Check ${{ matrix.port }} - ${{ matrix.version }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate code
+        uses: josverl/typecheck_mp@latest
+        with:
+          mp-stubs: micropython-${{ matrix.port }}-stubs~=${{ matrix.version }}
+          typechecker: pyright
+``
+Note: You will need to validate that type-subs are available for the specified boards and versions. If not the action will fail.
+If you need additional type-stubs published, please [raise an issue](https://github.com/Josverl/micropython-stubs/issues) with the details of the board.
+
+
 
