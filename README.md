@@ -98,7 +98,7 @@ exclude = [
 ### Using multiple configurations
 
 Actions allow you to validate your code against the type stubs of multiple ports, boards and versions of MicroPython.
-Below is an example of a matrix test against multipl boards and versions.
+Below is an example of a matrix test against multiple boards and versions.
 ![image](https://github.com/user-attachments/assets/bb2f0c72-c573-454a-8835-58ef9df72855)
 
 ```YAML
@@ -117,7 +117,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Validate code
-        uses: josverl/typecheck_mp@latest
+        uses: josverl/mp_typecheck@latest
         with:
           mp-stubs: micropython-${{ matrix.port }}-stubs~=${{ matrix.version }}
           typechecker: pyright
