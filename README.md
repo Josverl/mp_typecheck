@@ -1,4 +1,4 @@
-# typecheck_mp
+# mp_typecheck
 Static Type checking for MicroPython modules and applications 
 
 Use this action to check your micropython code for type errors and other issues.
@@ -19,7 +19,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Validate code
-        uses: josverl/typecheck_mp@latest
+        uses: josverl/mp_typecheck@latest
         with:
           typechecker: pyright, mypy
           mp-stubs: micropython-rp2-pico_w-stubs
