@@ -9,9 +9,11 @@ In addition to the type checker you can configure which type stubs to use for th
 Example usage:
 ```yaml
 on:
-  push:
   workflow_dispatch:
-
+  push:
+  pull_request:
+    branches:
+      - master
 jobs:
   CI:
     runs-on: ubuntu-latest
